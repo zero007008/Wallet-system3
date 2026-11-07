@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#090711">
+<title>Yoko Wallet & Shop</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="container">
+
+<header>
+  <div>
+    <div class="logo">YOKO <span>WALLET</span></div>
+    <div class="small">Wallet • Shopping • Orders</div>
+  </div>
+  <div id="headerUser" class="small">Guest</div>
+</header>
+
+<div id="authPanel" class="auth hidden">
+  <div class="panel">
+    <h1>Yoko Wallet</h1>
+    <p>Secure wallet and online shopping</p>
+
+    <div id="loginBox">
+      <h2>Welcome Back</h2>
+      <form id="loginForm">
+        <label>Phone Number</label>
+        <input name="phone" placeholder="09xxxxxxxxx" required>
+        <label>Password</label>
+        <input name="password" type="password" placeholder="Password" required>
+        <button class="btn full">Login</button>
+      </form>
+      <p>Don't have an account?
+        <span class="link" onclick="showRegister()">Create Account</span>
+      </p>
+    </div>
+
+    <div id="registerBox" class="hidden">
+      <h2>Create Account</h2>
+      <form id="registerForm">
+        <label>Full Name</label>
+        <input name="name" placeholder="Your name" required>
+        <label>Phone Number</label>
+        <input name="phone" placeholder="09xxxxxxxxx" required>
+        <label>Password</label>
+        <input name="password" type="password" minlength="8" placeholder="Minimum 8 characters" required>
+        <button class="btn full">Create Account</button>
+      </form>
+      <p>Already have an account?
+        <span class="link" onclick="showLogin()">Login</span>
+      </p>
+    </div>
+
+    <div id="authMessage" class="message"></div>
+  </div>
+</div>
+
+<div id="dashboard" class="hidden">
+
+  <div class="wallet-grid">
+    <div class="stat">
+      <small>Available Wallet Balance</small>
+      <strong id="balance">0 MMK</strong>
+    </div>
+    <div class="stat">
+      <small>Account ID</small>
+      <strong id="accountId">-</strong>
+    </div>
+    <div class="stat">
+      <small>Phone</small>
+      <strong id="accountPhone">-</strong>
+    </div>
+  </div>
+
+  <div class="nav">
+    <button class="active" data-tab="shop">🛍 Shop</button>
+    <button data-tab="cart">🛒 Cart <span id="cartCount">0</span></button>
+    <button data-tab="orders">📦 Orders</button>
+    <button data-tab="deposit">＋ Deposit</button>
+    <button data-tab="account">👤 Account</button>
+  </div>
+
+  <!-- SHOP -->
+  <section id="shop" class="section active">
+    <div class="panel">
+      <h2>Discover Products</h2>
+      <p>Explore products from our sample catalog.</p>
+
+      <div class="search-wrap">
+        <div class="toolbar">
+          <input id="searchInput" placeholder="Search products..." autocomplete="off">
+          <button class="btn" onclick="searchProducts()">Search</button>
+        </div>
+        <div id="autocomplete" class="autocomplete hidden"></div>
+      </div>
+
+      <div id="categories" class="categories">
+        <span class="small">Loading categories...</span>
+      </div>
+      <div class="small" id="productCount"></div>
+    </div>
+
+    <div id="products" class="products">
+      <div class="empty">Loading products...</div>
+    </div>
+
+    <div class="load-more">
+      <button class="btn secondary" onclick="loadMore()">Load More</button>
+    </div>
+
+    <div class="small center">
+      Sample exchange rate: 1 USD = 4,799.36 MMK
+    </div>
+  </section>
+
+  <!-- CART -->
+  <section id="cart" class="section">
+    <div class="panel">
+      <h2>Shopping Cart</h2>
+      <div id="cartItems"></div>
+      <div id="cartSummary" class="hidden">
+        <div class="total">
+          <span>Total</span><span id="cartTotal">0 MMK</span>
+        </div>
+        <div class="small">Final price is verified by the server at checkout.</div>
+        <button id="checkoutBtn" class="btn full" onclick="checkout()">Checkout with Wallet</button>
+      </div>
+      <div id="cartMessage" class="message"></div>
+    </div>
+  </section>
+
+  <!-- ORDERS -->
+  <section id="orders" class="section">
+    <div class="panel">
+      <div class="section-heading">
+        <div>
+          <h2>My Orders</h2>
+          <p>Track your order status.</p>
+        </div>
+        <button class="btn secondary" onclick="loadOrders()">↻ Refresh</button>
+      </div>
+      <div id="ordersList">Loading...</div>
+    </div>
+  </section>
+
+  <!-- ORDER DETAILS MODAL -->
+  <div id="orderModal" class="modal hidden">
+    <div class="modal-backdrop" onclick="closeOrderModal()"></div>
+    <div class="modal-card">
+      <div class="modal-header">
+        <h2>Order Details</h2>
+        <button class="close-btn" onclick="closeOrderModal()">×</button>
+      </div>
+      <div id="orderDetailsContent"></div>
+    </div>
+  </div>
+
+  <!-- DEPOSIT -->
+  <section id="deposit" class="section">
+    <div class="panel">
+      <h2>＋ Deposit Money</h2>
+      <p>Submit payment details for manual admin verification.</p>
+
+      <form id="depositForm">
+        <label>Payment Provider</label>
+        <select id="provider" name="provider" required>
+          <option value="">Select Provider</option>
+        </select>
+
+        <label>Amount (MMK)</label>
+        <input id="depositAmount" name="amount" type="number" min="1000" placeholder="Enter amount" required>
+
+        <label>Sender Phone Number</label>
+        <input id="senderPhone" name="sender_phone" placeholder="09xxxxxxxxx" required>
+
+        <label>Transaction ID (Last 6 Digits)</label>
+        <input id="transactionLast6" name="transaction_last6" minlength="6" maxlength="6" placeholder="Enter last 6 digits" required>
+
+        <label>Payment Receipt Screenshot</label>
+        <input id="receipt" name="receipt" type="file" accept="image/jpeg,image/png,image/webp" required>
+        <div class="small">JPG, PNG or WEBP · Maximum 5 MB</div>
+
+        <button id="depositButton" class="btn full deposit-submit">Submit Deposit Request</button>
+      </form>
+      <div id="depositMessage" class="message"></div>
+    </div>
+
+    <div class="panel">
+      <h2>Deposit History</h2>
+      <button class="btn secondary" onclick="loadDepositHistory()">Refresh History</button>
+      <div id="depositHistory" class="history-list">Loading history...</div>
+    </div>
+  </section>
+
+  <!-- ACCOUNT -->
+  <section id="account" class="section">
+    <div class="panel">
+      <h2>My Account</h2>
+      <p>Name: <strong id="profileName">-</strong></p>
+      <p>Phone: <strong id="profilePhone">-</strong></p>
+      <p>Account ID: <strong id="profileId">-</strong></p>
+      <p>Balance: <strong id="profileBalance">0 MMK</strong></p>
+      <button class="btn danger full" onclick="logout()">Logout</button>
+    </div>
+  </section>
+
+</div>
+
+<footer>YOKO WALLET & SHOP · SECURE SYSTEM · 2026</footer>
+</div>
+
+<script src="app.js" defer></script>
+</body>
+            </html>
